@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import type { PlayerBuild } from "./types";
 import BaseShardMenu from "./components/BaseShardMenu";
 import OverviewCard from "./components/OverviewCard";
-import { calculateDailyShards, enemyRewardRules, simulateDeterministicRun} from "./utils/calculations";
+import {
+    calculateDailyShards,
+    enemyRewardRules,
+    simulateDeterministicRun,
+} from "./utils/calculations";
 import { ModeToggle } from "./components/mode-toggle";
-
+import ShardBreakdown from "./components/ShardBreakdown";
 
 const CURRENT_VERSION = 1.0;
 const DEFAULT_BUILD = {
@@ -31,7 +35,7 @@ const DEFAULT_BUILD = {
 };
 
 function App() {
-    const [activeTab, setActiveTab] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<string | null>("base");
     const [build, setBuild] = useState<PlayerBuild>(() => {
         const saved = localStorage.getItem("player_build");
 
@@ -60,9 +64,14 @@ function App() {
         ...build,
     });
 
-    const simResult = simulateDeterministicRun(build.farmingTier, build.farmingWave, enemyRewardRules, build);
+    const simResult = simulateDeterministicRun(
+        build.farmingTier,
+        build.farmingWave,
+        enemyRewardRules,
+        build
+    );
 
-    const total = dailyShards+simResult;
+    const total = dailyShards + simResult;
 
     return (
         <>
@@ -78,19 +87,28 @@ function App() {
                         onClick={() => setActiveTab("base")}
                         active={activeTab === "base"}
                     />
-                     <OverviewCard
+                    <OverviewCard
                         name="Fleet Shards"
                         value={simResult.toFixed()}
                         onClick={() => setActiveTab("base")}
                         active={activeTab === "base"}
                     />
-                     <OverviewCard
-                        name="TotalShards"
-                        value={total.toFixed()}                     
+                    <OverviewCard
+                        name="TotalShards (click for breakdown)"
+                        value={total.toFixed()}
+                        onClick={() => setActiveTab("breakdown")}
+                        active={activeTab === "breakdown"}
                     />
                 </div>
+                <div className="rounded-xl border p-6 shadow-sm min-h-[300px] mt-8">
+                    {activeTab === "base" && (
+                        <BaseShardMenu data={build} setBuild={setBuild} />
+                    )}
 
-                <BaseShardMenu data={build} setBuild={setBuild} />
+                    {activeTab === "breakdown" && (
+                        <ShardBreakdown data={build} totalShards={total} simResult={simResult} />
+                    )}
+                </div>
             </div>
         </>
     );
