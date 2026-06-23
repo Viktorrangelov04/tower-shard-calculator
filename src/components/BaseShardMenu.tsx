@@ -50,14 +50,16 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                         type="number"
                         max={50}
                         value={data.DMSValue}
-                        onChange={(e) =>
-                            updateField("DMSValue", Number(e.target.value))
-                        }
+                        onChange={(e) => {
+                            const val = Number(e.target.value);
+
+                            updateField("DMSValue", Math.min(val, 50));
+                        }}
                     />
                 </div>
 
                 <CardLevelPicker
-                    label="Highest Tier"
+                    label="Highest Tier Unlocked"
                     levels={HIGHEST_TIER}
                     currentLevel={data.highestTier}
                     onChange={(val) => updateField("highestTier", val)}
