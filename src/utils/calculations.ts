@@ -141,8 +141,6 @@ export function simulateDeterministicRun(
     return dailyRewards;
 }
 
-const GEM = 0;
-const MEDAL = 1;
 const REROLL = 2;
 const CANNON = 3;
 const ARMOR = 4;
@@ -150,7 +148,6 @@ const GENERATOR = 5;
 const CORE = 6;
 const COMMON = 7;
 const RARE = 8;
-const COINS = 9;
 
 const BASE_CHANCES = [0.04, 0.02, 0.03, 0.01, 0.01, 0.01, 0.01, 0.004, 0.001, 0.865];
 const CAPS = [20, 10, -1, -1, -1, -1, -1, 5, 2, -1];
