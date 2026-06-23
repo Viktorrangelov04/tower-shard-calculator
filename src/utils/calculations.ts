@@ -8,7 +8,7 @@ import {
     WS_CARD,
     WS_MASTERY,
 } from "@/data/constants";
-import type { fleetRewards, PlayerBuild, TierConfig } from "@/types";
+import type { AverageRewards, fleetRewards, PlayerBuild, TierConfig } from "@/types";
 
 const calculateWaveSkip = (inputs: PlayerBuild): number => {
     const WSCard = WS_CARD[inputs.WSCardLevel] / 100;
@@ -50,22 +50,34 @@ export const calculateDropChances = (inputs: PlayerBuild): number => {
     return total;
 };
 
-export const calculateRPC = (inputs: PlayerBuild):number =>{
+export const calculateFetch = (inputs: PlayerBuild): number => {
+    const SSValue = 1+SS_LAB[inputs.SSValue]/100
+    const simulation = getAverageFetchRewards(inputs)
+
+    const moduleDrops = (simulation.avgCommonModules * 5 + simulation.avgRareModules*10) * SSValue
+
+    const total = simulation.avgTotalShards + moduleDrops;
+    return total;
+};
+
+export const calculateRPC = (inputs: PlayerBuild): number => {
     const SSValue = 1 + SS_LAB[inputs.SSValue] / 100;
     const RPCValue = inputs.RPCValue / 100;
     const RPCMastery = RPC_MASTERY[inputs.RPCMastery] / 100;
     const effectiveRPC = inputs.waveValue * RPCValue * RPCMastery * 5 * SSValue;
     return effectiveRPC;
-}
+};
 
 export const calculateDailyShards = (inputs: PlayerBuild): number => {
     const effectiveDMS = calculateDMS(inputs);
 
-    const dropChances = calculateDropChances(inputs)
+    const dropChances = calculateDropChances(inputs);
 
-    const effectiveRPC = calculateRPC(inputs)
+    const effectiveRPC = calculateRPC(inputs);
 
-    const total = effectiveDMS + dropChances + effectiveRPC;
+    const effectiveFetch = calculateFetch(inputs);
+
+    const total = effectiveDMS + dropChances + effectiveRPC + effectiveFetch;
     return total;
 };
 
@@ -107,7 +119,6 @@ export function simulateDeterministicRun(
     if (!tier) throw new Error(`Tier key ${tierKey} does not exist.`);
 
     let totalRewards = 0;
-    // let totalSpawns = 0;
     const spawnCountMultiplier = tier.count ?? 1;
 
     for (let wave = 1; wave <= maxWave; wave++) {
@@ -117,7 +128,6 @@ export function simulateDeterministicRun(
                     const spawnsThisWave = spawnCountMultiplier;
                     const rewardPerFleet = getFleetReward(wave, rewardConfig);
 
-                    // totalSpawns += spawnsThisWave;
                     totalRewards += rewardPerFleet * spawnsThisWave;
                 }
             }
@@ -129,4 +139,103 @@ export function simulateDeterministicRun(
             totalRewards) /
         5;
     return dailyRewards;
+}
+
+const REROLL = 2;
+const CANNON = 3;
+const ARMOR = 4;
+const GENERATOR = 5;
+const CORE = 6;
+const COMMON = 7;
+const RARE = 8;
+
+const BASE_CHANCES = [0.04, 0.02, 0.03, 0.01, 0.01, 0.01, 0.01, 0.004, 0.001, 0.865];
+const CAPS = [20, 10, -1, -1, -1, -1, -1, 5, 2, -1];
+
+function simulateOneDayFast(build: PlayerBuild): [number, number, number] {
+  const inGameSecondsInDay = 24 * 60 * 60 * 5; 
+  const totalTriggers = Math.floor(inGameSecondsInDay / build.fetchCD);
+  
+  const findChance = build.fetchFC > 1 ? build.fetchFC / 100 : build.fetchFC;
+  const doubleFindChance = build.fetchDFC > 1 ? build.fetchDFC / 100 : build.fetchDFC;
+
+  const counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const activeChances = [...BASE_CHANCES];
+  const cumulative = new Float64Array(10);
+  let needsRecomp = true;
+
+  for (let trigger = 0; trigger < totalTriggers; trigger++) {
+    if (Math.random() > findChance) {
+      continue;
+    }
+
+    const countToFind = Math.random() < doubleFindChance ? 2 : 1;
+
+    for (let i = 0; i < countToFind; i++) {
+      if (needsRecomp) {
+        let activePremiumSum = 0;
+        for (let j = 0; j < 9; j++) {
+          if (j !== REROLL) {
+            activePremiumSum += activeChances[j];
+          }
+        }
+
+        const targetPremiumSum = 0.105; 
+        
+        let runningSum = 0;
+        for (let j = 0; j < 9; j++) {
+          if (j === REROLL) {
+
+            runningSum += BASE_CHANCES[REROLL];
+          } else if (activePremiumSum > 0) {
+            runningSum += (activeChances[j] / activePremiumSum) * targetPremiumSum;
+          }
+          cumulative[j] = runningSum;
+        }
+        cumulative[9] = 1.0; 
+        
+        needsRecomp = false;
+      }
+
+      const roll = Math.random();
+      let rolledIdx = 9; 
+      for (let j = 0; j < 10; j++) {
+        if (roll <= cumulative[j]) {
+          rolledIdx = j;
+          break;
+        }
+      }
+
+      counts[rolledIdx]++;
+
+      const cap = CAPS[rolledIdx];
+      if (cap !== -1 && counts[rolledIdx] >= cap) {
+        activeChances[rolledIdx] = 0;
+        needsRecomp = true;
+      }
+    }
+  }
+
+  const totalShards = counts[CANNON] + counts[ARMOR] + counts[GENERATOR] + counts[CORE];
+  return [totalShards, counts[COMMON], counts[RARE]];
+}
+
+export function getAverageFetchRewards(build: PlayerBuild): AverageRewards {
+  let totalShards = 0;
+  let totalCommonModules = 0;
+  let totalRareModules = 0;
+  const iterations = 1000; 
+
+  for (let d = 0; d < iterations; d++) {
+    const [shards, common, rare] = simulateOneDayFast(build);
+    totalShards += shards;
+    totalCommonModules += common;
+    totalRareModules += rare;
+  }
+
+  return {
+    avgTotalShards: Number((totalShards / iterations).toFixed(2)),
+    avgCommonModules: Number((totalCommonModules / iterations).toFixed(2)),
+    avgRareModules: Number((totalRareModules / iterations).toFixed(2)),
+  };
 }

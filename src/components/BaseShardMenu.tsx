@@ -29,11 +29,13 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
 
     return (
         <>
-            <div className="w-4/5 mx-auto flex flex-col gap-4">
-                <div className="flex">
-                    <Label className="pr-4">Non skipped waves per day</Label>
+            <div className="w-full max-w-3xl mx-auto px-4 sm:w-4/5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                    <Label className="sm:pr-4 sm:flex-1">
+                        Non skipped waves per day
+                    </Label>
                     <Input
-                        className="w-1/5"
+                        className="w-full sm:w-1/5"
                         type="number"
                         id="waveInput"
                         value={data.waveValue}
@@ -43,10 +45,12 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     />
                 </div>
 
-                <div className="flex">
-                    <Label className="pr-4">Daily Mission Shards lab</Label>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                    <Label className="sm:pr-4 sm:flex-1">
+                        Daily Mission Shards lab
+                    </Label>
                     <Input
-                        className="w-1/5"
+                        className="w-full sm:w-1/5"
                         type="number"
                         max={50}
                         value={data.DMSValue}
@@ -106,10 +110,12 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     prefix=""
                 />
 
-                <div className="flex">
-                    <Label className="pr-4">Recovery Package Chance</Label>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                    <Label className="sm:pr-4 sm:flex-1">
+                        Recovery Package Chance
+                    </Label>
                     <Input
-                        className="w-1/5"
+                        className="w-full sm:w-1/5"
                         type="number"
                         id="RPCValue"
                         value={data.RPCValue}
@@ -146,7 +152,7 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     unit="%"
                     prefix=""
                 />
-                <div className="flex">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
                         <Label className="pb-2">Fetch CD</Label>
                         <RangeSelect
@@ -158,8 +164,7 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                             formatLabel={(val) => `${val}s`}
                         />
                     </div>
-
-                    <div className="px-2">
+                    <div>
                         <Label className="pb-2">Fetch Find Chance</Label>
                         <RangeSelect
                             min={10}
@@ -170,7 +175,6 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                             formatLabel={(val) => `${val}%`}
                         />
                     </div>
-
                     <div>
                         <Label className="pb-2">Fetch Double Find Chance</Label>
                         <RangeSelect
@@ -183,8 +187,8 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                         />
                     </div>
                 </div>
-                <Label className="text-3xl"> Fleet Farming </Label>
-                <div className="h-0.25  bg-gray-500"></div>
+                <Label className="text-xl sm:text-3xl">Fleet Farming</Label>
+                <hr className="border-gray-500" />
 
                 <CardLevelPicker
                     label="Intro Sprint Mastery"
