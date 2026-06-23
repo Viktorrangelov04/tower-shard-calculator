@@ -35,3 +35,9 @@ export interface PlayerBuild {
     farmingTier: number;
     farmingWave: number;
 }
+
+export interface AverageRewards {
+  avgTotalShards: number;   
+  avgCommonModules: number;
+  avgRareModules: number;
+}

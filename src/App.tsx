@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PlayerBuild } from "./types";
 import BaseShardMenu from "./components/BaseShardMenu";
 import OverviewCard from "./components/OverviewCard";
@@ -9,6 +9,7 @@ import {
 } from "./utils/calculations";
 import { ModeToggle } from "./components/mode-toggle";
 import ShardBreakdown from "./components/ShardBreakdown";
+import DisclaimerBanner from "./components/DisclaimerBanner";
 
 const CURRENT_VERSION = 1.0;
 const DEFAULT_BUILD = {
@@ -60,26 +61,53 @@ function App() {
         localStorage.setItem("player_build", JSON.stringify(build));
     }, [build]);
 
-    const dailyShards = calculateDailyShards({
-        ...build,
-    });
+    const dailyShards = useMemo(() => {
+        return calculateDailyShards({ ...build });
+    }, [
+        build.fetchCD,
+        build.fetchFC,
+        build.fetchDFC,
+        build.waveValue,
+        build.DMSValue,
+        build.highestTier,
+        build.CDCValue,
+        build.RDCValue,
+        build.wavesPerBoss,
+        build.SSValue,
+        build.RPCMastery,
+        build.RPCValue,
+        build.WSCardLevel,
+        build.WSMasteryLevel
+    ]);
 
-    const simResult = simulateDeterministicRun(
+    const simResult = useMemo(() => {
+        return simulateDeterministicRun(
+            build.farmingTier,
+            build.farmingWave,
+            enemyRewardRules,
+            build
+        );
+    }, [
         build.farmingTier,
         build.farmingWave,
-        enemyRewardRules,
-        build
-    );
+        build.WSCardLevel,
+        build.WSMasteryLevel,
+        build.ISMastery
+    ]);
 
-    const total = dailyShards + simResult;
+    const total = useMemo(
+        () => dailyShards + simResult,
+        [dailyShards, simResult]
+    );
 
     return (
         <>
-            <div className="w-4/5 mx-auto flex flex-col gap-4 p-8">
+            <div className="w-full sm:w-4/5 mx-auto flex flex-col gap-4 p-8">
                 <div className="flex items-center justify-between">
                     <h1 className="my-8">Tower shard calculator</h1>{" "}
                     <ModeToggle />
                 </div>
+                <DisclaimerBanner />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <OverviewCard
                         name="Base Daily Shards"
@@ -106,7 +134,11 @@ function App() {
                     )}
 
                     {activeTab === "breakdown" && (
-                        <ShardBreakdown data={build} totalShards={total} simResult={simResult} />
+                        <ShardBreakdown
+                            data={build}
+                            totalShards={total}
+                            simResult={simResult}
+                        />
                     )}
                 </div>
             </div>

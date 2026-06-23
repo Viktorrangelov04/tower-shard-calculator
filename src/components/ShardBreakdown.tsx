@@ -4,8 +4,36 @@ import { Progress } from "./ui/progress";
 import {
     calculateDMS,
     calculateDropChances,
+    calculateFetch,
     calculateRPC,
 } from "@/utils/calculations";
+
+function ShardStatRow({
+    label,
+    value,
+    percent,
+}: {
+    label: string;
+    value: number;
+    percent: number;
+}) {
+    return (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-baseline gap-2">
+                <Label>{label}</Label>
+                <span className="font-medium">{value.toFixed()}</span>
+                <span className="text-muted-foreground">Shards</span>
+            </div>
+
+            <div className="flex w-full items-center gap-3 sm:w-1/2">
+                <span className="w-16 shrink-0 text-right">
+                    {percent.toFixed(2)}%
+                </span>
+                <Progress value={percent} className="h-2 flex-1" />
+            </div>
+        </div>
+    );
+}
 
 interface ShardBreakdownProps {
     data: PlayerBuild;
@@ -18,14 +46,16 @@ export default function ShardBreakdown({
     totalShards,
     simResult,
 }: ShardBreakdownProps) {
-
-    const DMS = calculateDMS({ ...data })
+    const DMS = calculateDMS({ ...data });
     const DMSpercent = (DMS / totalShards) * 100;
 
-    const DropChances = calculateDropChances({ ...data })
+    const DropChances = calculateDropChances({ ...data });
     const DropChancesPercent = (DropChances / totalShards) * 100;
 
-    const RPC = calculateRPC({ ...data })
+    const fetch = calculateFetch({ ...data });
+    const fetchPercent = (fetch / totalShards) * 100;
+
+    const RPC = calculateRPC({ ...data });
     const RPCpercent = (RPC / totalShards) * 100;
 
     const FleetPercent = (simResult / totalShards) * 100;
@@ -33,63 +63,31 @@ export default function ShardBreakdown({
     return (
         <>
             <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex">
-                        <Label className="pr-4">Daily Mission Shards: </Label>
-                        <span className="pr-2">{DMS}</span>
-                        <span>Shards</span>
-                    </div>
-                   
-                    <div className="w-1/2 flex items-center">
-                        <span className="pr-4">{DMSpercent.toFixed(2)}%</span>
-                        <Progress value={DMSpercent} className="h-2"></Progress>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div className="flex">
-                        <Label className="pr-4">Common/Rare Drop Chances</Label>
-                        <span className="pr-2">{DropChances.toFixed()}</span>
-                        <span>Shards</span>
-                    </div>
-                    
-                    <div className="w-1/2 flex items-center">
-                        <span className="pr-4">{DropChancesPercent.toFixed(2)}%</span>
-                        <Progress
-                            value={DropChancesPercent}
-                            className="h-2"
-                        ></Progress>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div className="flex">
-                        <Label className="pr-4">Recovery Package Mastery</Label>
-                        <span className="pr-2">{RPC.toFixed()}</span>
-                        <span>Shards</span>
-                    </div>
-                    
-                    <div className="w-1/2 flex items-center">
-                        <span className="pr-4">{RPCpercent.toFixed(2)}%</span>
-                        <Progress value={RPCpercent} className="h-2"></Progress>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div className="flex">
-                        <Label className="pr-4">Fleet Farming: </Label>
-                        <span className="pr-2">{simResult.toFixed()} </span>
-                        <span>Shards</span>
-                    </div>
-
-                    <div className="w-1/2 flex items-center">
-                        <span className="pr-4">{FleetPercent.toFixed(2)}%</span>
-                        <Progress
-                            value={FleetPercent}
-                            className="h-2"
-                        ></Progress>
-                    </div>
-                </div>
+                <ShardStatRow
+                    label="Daily Mission Shards:"
+                    value={DMS}
+                    percent={DMSpercent}
+                />
+                <ShardStatRow
+                    label="Common/Rare Drop Chances"
+                    value={DropChances}
+                    percent={DropChancesPercent}
+                />
+                <ShardStatRow
+                    label="Fetch"
+                    value={fetch}
+                    percent={fetchPercent}
+                />
+                <ShardStatRow
+                    label="Recovery Package Mastery"
+                    value={RPC}
+                    percent={RPCpercent}
+                />
+                <ShardStatRow
+                    label="Fleet Farming:"
+                    value={simResult}
+                    percent={FleetPercent}
+                />
             </div>
         </>
     );
