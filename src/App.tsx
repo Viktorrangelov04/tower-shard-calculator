@@ -62,6 +62,7 @@ function App() {
 
     const simResult = simulateDeterministicRun(build.farmingTier, build.farmingWave, enemyRewardRules, build);
 
+    const total = dailyShards+simResult;
 
     return (
         <>
@@ -82,6 +83,10 @@ function App() {
                         value={simResult.toFixed()}
                         onClick={() => setActiveTab("base")}
                         active={activeTab === "base"}
+                    />
+                     <OverviewCard
+                        name="TotalShards"
+                        value={total.toFixed()}                     
                     />
                 </div>
 
