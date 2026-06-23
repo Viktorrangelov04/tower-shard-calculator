@@ -113,9 +113,11 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                         type="number"
                         id="RPCValue"
                         value={data.RPCValue}
-                        onChange={(e) =>
-                            updateField("RPCValue", Number(e.target.value))
-                        }
+                        onChange={(e) => {
+                            const val = Number(e.target.value);
+
+                            updateField("RPCValue", Math.min(val, 97));
+                        }}
                     />
                 </div>
                 <CardLevelPicker
