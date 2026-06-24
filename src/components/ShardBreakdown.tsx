@@ -4,9 +4,9 @@ import { Progress } from "./ui/progress";
 import {
     calculateDMS,
     calculateDropChances,
-    calculateFetch,
     calculateRPC,
 } from "@/utils/calculations";
+
 
 function ShardStatRow({
     label,
@@ -39,12 +39,14 @@ interface ShardBreakdownProps {
     data: PlayerBuild;
     totalShards: number;
     simResult: number;
+    fetchShards: number;
 }
 
 export default function ShardBreakdown({
     data,
     totalShards,
     simResult,
+    fetchShards,
 }: ShardBreakdownProps) {
     const DMS = calculateDMS({ ...data });
     const DMSpercent = (DMS / totalShards) * 100;
@@ -52,8 +54,7 @@ export default function ShardBreakdown({
     const DropChances = calculateDropChances({ ...data });
     const DropChancesPercent = (DropChances / totalShards) * 100;
 
-    const fetch = calculateFetch({ ...data });
-    const fetchPercent = (fetch / totalShards) * 100;
+    const fetchPercent = (fetchShards / totalShards) * 100
 
     const RPC = calculateRPC({ ...data });
     const RPCpercent = (RPC / totalShards) * 100;
@@ -75,7 +76,7 @@ export default function ShardBreakdown({
                 />
                 <ShardStatRow
                     label="Fetch"
-                    value={fetch}
+                    value={fetchShards}
                     percent={fetchPercent}
                 />
                 <ShardStatRow

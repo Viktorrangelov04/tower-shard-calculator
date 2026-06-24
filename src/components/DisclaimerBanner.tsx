@@ -15,11 +15,6 @@ const DisclaimerBanner = () => {
                                     App still in development. If you find any
                                     issues message @vics80_ in Discord. 
                                 </p>
-                                <span className="font-bold">
-                                    Fetch
-                                    simulation is currently a little off the actual value
-                                    especially on the higher levels
-                                </span>
                             </div>
                         </div>
                         <button

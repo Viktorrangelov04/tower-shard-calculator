@@ -141,7 +141,6 @@ export function simulateDeterministicRun(
     return dailyRewards;
 }
 
-const REROLL = 2;
 const CANNON = 3;
 const ARMOR = 4;
 const GENERATOR = 5;
@@ -173,27 +172,20 @@ function simulateOneDayFast(build: PlayerBuild): [number, number, number] {
 
     for (let i = 0; i < countToFind; i++) {
       if (needsRecomp) {
-        let activePremiumSum = 0;
-        for (let j = 0; j < 9; j++) {
-          if (j !== REROLL) {
-            activePremiumSum += activeChances[j];
-          }
+        // Sum up all active, uncapped chances (including Coins and Reroll Shards)
+        let totalActiveSum = 0;
+        for (let j = 0; j < 10; j++) {
+          totalActiveSum += activeChances[j];
         }
-
-        const targetPremiumSum = 0.105; 
         
+        // Dynamically scale remaining items to fill exactly 100% space
         let runningSum = 0;
-        for (let j = 0; j < 9; j++) {
-          if (j === REROLL) {
-
-            runningSum += BASE_CHANCES[REROLL];
-          } else if (activePremiumSum > 0) {
-            runningSum += (activeChances[j] / activePremiumSum) * targetPremiumSum;
+        for (let j = 0; j < 10; j++) {
+          if (totalActiveSum > 0) {
+            runningSum += activeChances[j] / totalActiveSum;
           }
           cumulative[j] = runningSum;
         }
-        cumulative[9] = 1.0; 
-        
         needsRecomp = false;
       }
 
@@ -216,8 +208,11 @@ function simulateOneDayFast(build: PlayerBuild): [number, number, number] {
     }
   }
 
-  const totalShards = counts[CANNON] + counts[ARMOR] + counts[GENERATOR] + counts[CORE];
-  return [totalShards, counts[COMMON], counts[RARE]];
+  const baseShardDrops = counts[CANNON] + counts[ARMOR] + counts[GENERATOR] + counts[CORE];
+  
+  const shardsFromDrops = baseShardDrops * 3;
+
+  return [shardsFromDrops, counts[COMMON], counts[RARE]];
 }
 
 export function getAverageFetchRewards(build: PlayerBuild): AverageRewards {
