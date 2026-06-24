@@ -4,6 +4,7 @@ import BaseShardMenu from "./components/BaseShardMenu";
 import OverviewCard from "./components/OverviewCard";
 import {
     calculateDailyShards,
+    calculateFetch,
     enemyRewardRules,
     simulateDeterministicRun,
 } from "./utils/calculations";
@@ -80,6 +81,12 @@ function App() {
         build.WSMasteryLevel
     ]);
 
+    const fetch = useMemo(() => {
+            return calculateFetch({ ...build });
+        }, [build.fetchCD, build.fetchFC, build.fetchDFC]);
+    
+        
+        
     const simResult = useMemo(() => {
         return simulateDeterministicRun(
             build.farmingTier,
@@ -138,6 +145,7 @@ function App() {
                             data={build}
                             totalShards={total}
                             simResult={simResult}
+                            fetchShards={fetch}
                         />
                     )}
                 </div>
