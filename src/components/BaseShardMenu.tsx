@@ -39,9 +39,11 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                         type="number"
                         id="waveInput"
                         value={data.waveValue}
-                        onChange={(e) =>
-                            updateField("waveValue", Number(e.target.value))
-                        }
+                         onChange={(e) => {
+                                const val = Number(e.target.value);
+
+                                updateField("waveValue", Math.min(val, 14000));
+                            }}
                     />
                 </div>
 
@@ -204,7 +206,9 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                             label="Farming Tier"
                             levels={FARMING_TIER}
                             currentLevel={data.farmingTier}
-                            onChange={(val) => updateField("farmingTier", val)}
+                            onChange={(val) =>
+                                updateField("farmingTier", Math.min(val, 30000))
+                            }
                             unit=""
                             prefix=""
                             min={14}
@@ -218,12 +222,11 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                             type="number"
                             id="farmingWave"
                             value={data.farmingWave}
-                            onChange={(e) =>
-                                updateField(
-                                    "farmingWave",
-                                    Number(e.target.value)
-                                )
-                            }
+                            onChange={(e) => {
+                                const val = Number(e.target.value);
+
+                                updateField("farmingWave", Math.min(val, 30000));
+                            }}
                         />
                     </div>
                 </div>
