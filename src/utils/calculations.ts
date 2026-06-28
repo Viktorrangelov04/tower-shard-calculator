@@ -33,19 +33,12 @@ export const calculateDropChances = (inputs: PlayerBuild): number => {
     const CDCValue = CDC_LAB[inputs.CDCValue] / 100;
     const RDCValue = RDC_LAB[inputs.RDCValue] / 100;
     const WSMulti = calculateWaveSkip(inputs);
+    const waveValue = (inputs.waveValue/100) * (86400 /30.14) * 5
 
-    const effectiveCDC =
-        ((inputs.waveValue * WSMulti) / inputs.wavesPerBoss) *
-        CDCValue *
-        5 *
-        SSValue;
-    const effectiveRDC =
-        ((inputs.waveValue * WSMulti) / inputs.wavesPerBoss) *
-        RDCValue *
-        10 *
-        SSValue;
+    const CDC = ((waveValue* WSMulti) / inputs.wavesPerBoss) * SSValue *(CDCValue * 5)
+    const RDC = inputs.shattersRares ? ((waveValue* WSMulti) / inputs.wavesPerBoss) * SSValue *(RDCValue * 10) : 0;
 
-    const total = effectiveCDC + effectiveRDC;
+    const total = CDC+RDC
 
     return total;
 };
@@ -56,7 +49,7 @@ export const calculateFetch = (inputs: PlayerBuild): number => {
 
     const moduleDrops = (simulation.avgCommonModules * 5 + simulation.avgRareModules*10) * SSValue
 
-    const total = simulation.avgTotalShards + moduleDrops;
+    const total = inputs.hasFetch ? simulation.avgTotalShards + moduleDrops : 0;
     return total;
 };
 
@@ -64,7 +57,9 @@ export const calculateRPC = (inputs: PlayerBuild): number => {
     const SSValue = 1 + SS_LAB[inputs.SSValue] / 100;
     const RPCValue = inputs.RPCValue / 100;
     const RPCMastery = RPC_MASTERY[inputs.RPCMastery] / 100;
-    const effectiveRPC = inputs.waveValue * RPCValue * RPCMastery * 5 * SSValue;
+    const waveValue = (inputs.waveValue/100) * (86400 /30.14) * 5
+
+    const effectiveRPC = inputs.hasRPC ? waveValue * RPCValue * RPCMastery * 5 * SSValue : 0;
     return effectiveRPC;
 };
 

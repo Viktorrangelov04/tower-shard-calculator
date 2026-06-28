@@ -19,7 +19,9 @@ const DEFAULT_BUILD = {
     DMSValue: 0,
     highestTier: 1,
     wavesPerBoss: 10,
+    shattersRares: true,
     CDCValue: 0,
+    hasRPC: false,
     RDCValue: 0,
     SSValue: 0,
     RPCValue: 30,
@@ -27,6 +29,7 @@ const DEFAULT_BUILD = {
     WSCardLevel: 0,
     WSMasteryLevel: 0,
 
+    hasFetch: false,
     fetchCD: 120,
     fetchFC: 10,
     fetchDFC: 2,
@@ -78,7 +81,10 @@ function App() {
         build.RPCMastery,
         build.RPCValue,
         build.WSCardLevel,
-        build.WSMasteryLevel
+        build.WSMasteryLevel,
+        build.shattersRares,
+        build.hasRPC,
+        build.hasFetch
     ]);
 
     const fetch = useMemo(() => {
