@@ -14,6 +14,7 @@ import {
     WS_MASTERY,
 } from "@/data/constants";
 import { RangeSelect } from "./RangeSelect";
+import { Switch } from "./ui/switch";
 
 interface BaseShardProps {
     data: PlayerBuild;
@@ -32,18 +33,18 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
             <div className="w-full max-w-3xl mx-auto px-4 sm:w-4/5 flex flex-col gap-4">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
                     <Label className="sm:pr-4 sm:flex-1">
-                        Non skipped waves per day
+                        Active farm time 0-100%
                     </Label>
                     <Input
                         className="w-full sm:w-1/5"
                         type="number"
                         id="waveInput"
                         value={data.waveValue}
-                         onChange={(e) => {
-                                const val = Number(e.target.value);
+                        onChange={(e) => {
+                            const val = Number(e.target.value);
 
-                                updateField("waveValue", Math.min(val, 14000));
-                            }}
+                            updateField("waveValue", Math.min(val, 100));
+                        }}
                     />
                 </div>
 
@@ -103,6 +104,14 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     prefix=""
                 />
 
+                 <div className="flex gap-2 items-center">
+                    <p>Shattering rares</p>
+                    <Switch
+                        checked={data.shattersRares}
+                        onCheckedChange={(v) => updateField("shattersRares", v)}
+                    />
+                </div>
+
                 <CardLevelPicker
                     label="Shatter Shards lab level"
                     levels={SS_LAB}
@@ -112,30 +121,46 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     prefix=""
                 />
 
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
-                    <Label className="sm:pr-4 sm:flex-1">
-                        Recovery Package Chance
-                    </Label>
-                    <Input
-                        className="w-full sm:w-1/5"
-                        type="number"
-                        id="RPCValue"
-                        value={data.RPCValue}
-                        onChange={(e) => {
-                            const val = Number(e.target.value);
-
-                            updateField("RPCValue", Math.min(val, 97));
-                        }}
+                <div className="flex gap-2 items-center">
+                    <p>RPC Mastery Unlocked?</p>
+                    <Switch
+                        checked={data.hasRPC}
+                        onCheckedChange={(v) => updateField("hasRPC", v)}
                     />
                 </div>
-                <CardLevelPicker
-                    label="Recovery Package Chance Mastery level"
-                    levels={RPC_MASTERY}
-                    currentLevel={data.RPCMastery}
-                    onChange={(val) => updateField("RPCMastery", val)}
-                    unit="%"
-                    prefix=""
-                />
+
+                {data.hasRPC ? (
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                            <Label className="sm:pr-4 sm:flex-1">
+                                Recovery Package Chance
+                            </Label>
+                            <Input
+                                className="w-full sm:w-1/5"
+                                type="number"
+                                id="RPCValue"
+                                value={data.RPCValue}
+                                onChange={(e) => {
+                                    const val = Number(e.target.value);
+
+                                    updateField("RPCValue", Math.min(val, 97));
+                                }}
+                            />
+                        </div>
+                        <CardLevelPicker
+                            label="Recovery Package Chance Mastery level"
+                            levels={RPC_MASTERY}
+                            currentLevel={data.RPCMastery}
+                            onChange={(val) => updateField("RPCMastery", val)}
+                            unit="%"
+                            prefix=""
+                        />
+                    </div>
+                ) : (
+                    <div className="w-full text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+                        Enable Mastery to configure levels
+                    </div>
+                )}
 
                 <CardLevelPicker
                     label="Wave Skip Level"
@@ -154,41 +179,58 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     unit="%"
                     prefix=""
                 />
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <Label className="pb-2">Fetch CD</Label>
-                        <RangeSelect
-                            min={120}
-                            max={60}
-                            step={-1}
-                            value={data.fetchCD}
-                            onChange={(val) => updateField("fetchCD", val)}
-                            formatLabel={(val) => `${val}s`}
-                        />
-                    </div>
-                    <div>
-                        <Label className="pb-2">Fetch Find Chance</Label>
-                        <RangeSelect
-                            min={10}
-                            max={50}
-                            step={1}
-                            value={data.fetchFC}
-                            onChange={(val) => updateField("fetchFC", val)}
-                            formatLabel={(val) => `${val}%`}
-                        />
-                    </div>
-                    <div>
-                        <Label className="pb-2">Fetch Double Find Chance</Label>
-                        <RangeSelect
-                            min={2}
-                            max={50}
-                            step={1}
-                            value={data.fetchDFC}
-                            onChange={(val) => updateField("fetchDFC", val)}
-                            formatLabel={(val) => `${val}%`}
-                        />
-                    </div>
+
+                <div className="flex gap-2 items-center">
+                    <p>Fetch Unlocked?</p>
+                    <Switch
+                        checked={data.hasFetch}
+                        onCheckedChange={(v) => updateField("hasFetch", v)}
+                    />
                 </div>
+
+                {data.hasFetch ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div>
+                            <Label className="pb-2">Fetch CD</Label>
+                            <RangeSelect
+                                min={120}
+                                max={60}
+                                step={-1}
+                                value={data.fetchCD}
+                                onChange={(val) => updateField("fetchCD", val)}
+                                formatLabel={(val) => `${val}s`}
+                            />
+                        </div>
+                        <div>
+                            <Label className="pb-2">Fetch Find Chance</Label>
+                            <RangeSelect
+                                min={10}
+                                max={50}
+                                step={1}
+                                value={data.fetchFC}
+                                onChange={(val) => updateField("fetchFC", val)}
+                                formatLabel={(val) => `${val}%`}
+                            />
+                        </div>
+                        <div>
+                            <Label className="pb-2">
+                                Fetch Double Find Chance
+                            </Label>
+                            <RangeSelect
+                                min={2}
+                                max={50}
+                                step={1}
+                                value={data.fetchDFC}
+                                onChange={(val) => updateField("fetchDFC", val)}
+                                formatLabel={(val) => `${val}%`}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="w-full text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+                        Enable Fetch to configure levels
+                    </div>
+                )}
                 <Label className="text-xl sm:text-3xl">Fleet Farming</Label>
                 <hr className="border-gray-500" />
 
@@ -225,7 +267,10 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                             onChange={(e) => {
                                 const val = Number(e.target.value);
 
-                                updateField("farmingWave", Math.min(val, 30000));
+                                updateField(
+                                    "farmingWave",
+                                    Math.min(val, 30000)
+                                );
                             }}
                         />
                     </div>

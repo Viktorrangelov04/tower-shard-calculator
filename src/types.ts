@@ -20,13 +20,16 @@ export interface PlayerBuild {
     DMSValue: number;
     highestTier: number;
     wavesPerBoss: number;
+    shattersRares: boolean;
     CDCValue: number;
+    hasRPC: boolean;
     RDCValue: number;
     SSValue: number;
     RPCValue: number;
     RPCMastery: number;
     WSCardLevel: number;
     WSMasteryLevel: number;
+    hasFetch: boolean;
     fetchCD: number;
     fetchFC: number;
     fetchDFC: number;
