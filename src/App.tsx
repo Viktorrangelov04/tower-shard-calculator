@@ -11,6 +11,8 @@ import {
 import { ModeToggle } from "./components/mode-toggle";
 import ShardBreakdown from "./components/ShardBreakdown";
 import DisclaimerBanner from "./components/DisclaimerBanner";
+import { Button } from "./components/ui/button";
+import TotalShardsCard from "./components/TotalShardsCard";
 
 const CURRENT_VERSION = 1.0;
 const DEFAULT_BUILD = {
@@ -61,10 +63,52 @@ function App() {
         return { ...DEFAULT_BUILD, version: CURRENT_VERSION };
     });
 
+    const [comparisonBuild, setComparisonBuild] = useState<PlayerBuild | null>(
+        () => {
+            const saved = localStorage.getItem("player_build_comparison");
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.version === CURRENT_VERSION) return parsed;
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            return null;
+        }
+    );
+
     useEffect(() => {
         localStorage.setItem("player_build", JSON.stringify(build));
     }, [build]);
 
+    useEffect(() => {
+        if (comparisonBuild) {
+            localStorage.setItem(
+                "player_build_comparison",
+                JSON.stringify(comparisonBuild)
+            );
+        } else {
+            localStorage.removeItem("player_build_comparison");
+        }
+    }, [comparisonBuild]);
+
+    const handleSaveComparison = () => {
+        setComparisonBuild({ ...build });
+    };
+
+    const handleClearComparison = () => {
+        setComparisonBuild(null);
+        localStorage.removeItem("player_build_comparison");
+    };
+
+    const handleReturn = () => {
+        if (comparisonBuild !== null) {
+            setBuild({ ...comparisonBuild });
+        }
+    };
+
+    // Calculate current values
     const dailyShards = useMemo(() => {
         return calculateDailyShards({ ...build });
     }, [
@@ -88,11 +132,9 @@ function App() {
     ]);
 
     const fetch = useMemo(() => {
-            return calculateFetch({ ...build });
-        }, [build.fetchCD, build.fetchFC, build.fetchDFC]);
-    
-        
-        
+        return calculateFetch({ ...build });
+    }, [build.fetchCD, build.fetchFC, build.fetchDFC]);
+
     const simResult = useMemo(() => {
         return simulateDeterministicRun(
             build.farmingTier,
@@ -112,6 +154,27 @@ function App() {
         () => dailyShards + simResult,
         [dailyShards, simResult]
     );
+
+    // Calculate comparison values
+    const dailyShards2 = useMemo(() => {
+        if (!comparisonBuild) return null;
+        return calculateDailyShards({ ...comparisonBuild });
+    }, [comparisonBuild]);
+
+    const simResult2 = useMemo(() => {
+        if (!comparisonBuild) return null;
+        return simulateDeterministicRun(
+            comparisonBuild.farmingTier,
+            comparisonBuild.farmingWave,
+            enemyRewardRules,
+            comparisonBuild
+        );
+    }, [comparisonBuild]);
+
+    const total2 = useMemo(() => {
+        if (dailyShards2 === null || simResult2 === null) return null;
+        return dailyShards2 + simResult2;
+    }, [dailyShards2, simResult2]);
 
     return (
         <>
@@ -134,26 +197,48 @@ function App() {
                         onClick={() => setActiveTab("base")}
                         active={activeTab === "base"}
                     />
-                    <OverviewCard
-                        name="TotalShards (click for breakdown)"
-                        value={total.toFixed()}
-                        onClick={() => setActiveTab("breakdown")}
-                        active={activeTab === "breakdown"}
+                    <TotalShardsCard
+                        name="Total Shards"
+                        value={total}
+                        value2={total2}
                     />
                 </div>
-                <div className="rounded-xl border p-6 shadow-sm min-h-[300px] mt-8">
-                    {activeTab === "base" && (
-                        <BaseShardMenu data={build} setBuild={setBuild} />
-                    )}
 
-                    {activeTab === "breakdown" && (
-                        <ShardBreakdown
+                <div className="controls flex justify-center mt-4">
+                    <Button className="mx-3" onClick={handleSaveComparison}>
+                        {comparisonBuild
+                            ? "Update Snapshot"
+                            : "Save for Comparison"}
+                    </Button>
+                    {comparisonBuild && (
+                        <div>
+                            <Button className="mx-3" variant="outline" onClick={handleClearComparison}>
+                                Close Comparison
+                            </Button>
+                            <Button className="mx-3" variant="secondary" onClick={handleReturn}>
+                                Undo Changes
+                            </Button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex flex-col gap-4">
+                        <div className="rounded-xl border p-6 shadow-sm min-h-[300px] mt-8">
+                            <BaseShardMenu data={build} setBuild={setBuild} />
+                        </div>
+                        
+               
+
+                        <div className="rounded-xl border p-6 shadow-sm min-h-[200px] mt-8">
+                            <ShardBreakdown
                             data={build}
                             totalShards={total}
                             simResult={simResult}
                             fetchShards={fetch}
                         />
-                    )}
+                        </div>
+                        
+                   
                 </div>
             </div>
         </>
