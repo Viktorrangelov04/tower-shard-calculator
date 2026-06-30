@@ -12,7 +12,7 @@ import type { AverageRewards, fleetRewards, PlayerBuild, TierConfig } from "@/ty
 
 const calculateWaveSkip = (inputs: PlayerBuild): number => {
     const WSCard = WS_CARD[inputs.WSCardLevel] / 100;
-    const WSMastery = WS_MASTERY[inputs.WSMasteryLevel] / 100;
+    const WSMastery = inputs.hasWSM ? WS_MASTERY[inputs.WSMasteryLevel] / 100 : 1;
 
     const WSBase = WSCard / (1 - WSCard);
     const WSPlusMulti = WSBase * (1 + WSMastery);

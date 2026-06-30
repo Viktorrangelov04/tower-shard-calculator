@@ -23,6 +23,7 @@ export interface PlayerBuild {
     shattersRares: boolean;
     CDCValue: number;
     hasRPC: boolean;
+    hasWSM: boolean;
     RDCValue: number;
     SSValue: number;
     RPCValue: number;

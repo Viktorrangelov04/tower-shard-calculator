@@ -171,6 +171,15 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     prefix=""
                 />
 
+                <div className="flex gap-2 items-center">
+                    <p>WS Mastery Unlocked?</p>
+                    <Switch
+                        checked={data.hasWSM}
+                        onCheckedChange={(v) => updateField("hasWSM", v)}
+                    />
+                </div>
+
+                {data.hasWSM ? (
                 <CardLevelPicker
                     label="Wave Skip Mastery Level"
                     levels={WS_MASTERY}
@@ -179,6 +188,11 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                     unit="%"
                     prefix=""
                 />
+                ) : (
+                     <div className="w-full text-center p-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+                        Enable Mastery to configure levels
+                    </div>
+                )}
 
                 <div className="flex gap-2 items-center">
                     <p>Fetch Unlocked?</p>
