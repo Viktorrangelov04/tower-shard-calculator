@@ -24,6 +24,7 @@ const DEFAULT_BUILD = {
     shattersRares: true,
     CDCValue: 0,
     hasRPC: false,
+    hasWSM: false,
     RDCValue: 0,
     SSValue: 0,
     RPCValue: 30,
@@ -133,7 +134,7 @@ function App() {
 
     const fetch = useMemo(() => {
         return calculateFetch({ ...build });
-    }, [build.fetchCD, build.fetchFC, build.fetchDFC]);
+    }, [build.fetchCD, build.fetchFC, build.fetchDFC, build.hasFetch]);
 
     const simResult = useMemo(() => {
         return simulateDeterministicRun(
