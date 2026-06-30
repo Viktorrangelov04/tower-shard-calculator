@@ -108,6 +108,7 @@ export function simulateDeterministicRun(
 ): number {
     const ISMastery = IS_MASTERY[build.ISMastery];
     const tier = gameTiers[tierKey];
+    const waveValue = (build.waveValue/100) * (86400 /30.14) * 5
 
     const WSMulti = calculateWaveSkip(build);
 
@@ -130,7 +131,7 @@ export function simulateDeterministicRun(
     }
 
     const dailyRewards =
-        (((build.waveValue * WSMulti) / (maxWave - ISMastery / WSMulti + 180)) *
+        (((waveValue * WSMulti) / (maxWave - ISMastery / WSMulti + 180)) *
             totalRewards) /
         5;
     return dailyRewards;
