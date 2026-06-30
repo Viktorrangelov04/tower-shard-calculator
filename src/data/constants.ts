@@ -1,5 +1,5 @@
 export const WS_CARD = [0, 9, 10, 11, 13, 15, 17, 19];
-export const WS_MASTERY = [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+export const WS_MASTERY = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 export const RPC_MASTERY = [ 0.4, 0.8, 1.2, 1.6, 2, 2.4, 2.8, 3.2, 3.6, 4];
 export const RDC_LAB = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5];
 export const CDC_LAB = [2, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3];
