@@ -12,13 +12,17 @@ import type { AverageRewards, fleetRewards, PlayerBuild, TierConfig } from "@/ty
 
 const calculateWaveSkip = (inputs: PlayerBuild): number => {
     const WSCard = WS_CARD[inputs.WSCardLevel] / 100;
-    const WSMastery = inputs.hasWSM ? WS_MASTERY[inputs.WSMasteryLevel] / 100 : 1;
 
+    if (!inputs.hasWSM) {
+
+        return 1 / (1 - WSCard);
+    }
+
+    const WSMastery = WS_MASTERY[inputs.WSMasteryLevel] / 100;
     const WSBase = WSCard / (1 - WSCard);
     const WSPlusMulti = WSBase * (1 + WSMastery);
-    const WSMulti = 1 / (1 - WSPlusMulti);
-
-    return WSMulti;
+    
+    return 1 / (1 - WSPlusMulti);
 };
 
 export const calculateDMS = (inputs: PlayerBuild): number => {
@@ -98,6 +102,9 @@ const gameTiers: Record<number, TierConfig> = {
     19: { tierNumber: 19, firstSpawn: 45, frequency: 50 },
     20: { tierNumber: 20, firstSpawn: 5, frequency: 10 },
     21: { tierNumber: 21, firstSpawn: 5, frequency: 10, count: 2 },
+    22: { tierNumber: 22, firstSpawn: 5, frequency: 10, count: 3},
+    23: { tierNumber: 23, firstSpawn: 5, frequency: 10, count: 3},
+    24: { tierNumber: 24, firstSpawn: 5, frequency: 10, count: 3}
 };
 
 export function simulateDeterministicRun(

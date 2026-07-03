@@ -109,7 +109,6 @@ function App() {
         }
     };
 
-    // Calculate current values
     const dailyShards = useMemo(() => {
         return calculateDailyShards({ ...build });
     }, [
@@ -148,7 +147,8 @@ function App() {
         build.farmingWave,
         build.WSCardLevel,
         build.WSMasteryLevel,
-        build.ISMastery
+        build.ISMastery,
+        build.hasWSM,
     ]);
 
     const total = useMemo(
