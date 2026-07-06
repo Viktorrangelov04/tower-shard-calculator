@@ -193,13 +193,13 @@ function App() {
                         active={activeTab === "base"}
                     />
                     <OverviewCard
-                        name="Fleet Shards"
+                        name="Daily Fleet Shards"
                         value={simResult.toFixed()}
                         onClick={() => setActiveTab("base")}
                         active={activeTab === "base"}
                     />
                     <TotalShardsCard
-                        name="Total Shards"
+                        name="Total Daily Shards"
                         value={total}
                         value2={total2}
                     />
