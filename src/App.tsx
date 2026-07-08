@@ -20,7 +20,6 @@ const DEFAULT_BUILD = {
     waveValue: 0,
     DMSValue: 0,
     highestTier: 1,
-    wavesPerBoss: 10,
     shattersRares: true,
     CDCValue: 0,
     hasRPC: false,
@@ -37,8 +36,7 @@ const DEFAULT_BUILD = {
     fetchFC: 10,
     fetchDFC: 2,
 
-    ISMastery: 0,
-    farmingTier: 14,
+    farmingTier: 1,
     farmingWave: 0,
 };
 
@@ -120,7 +118,6 @@ function App() {
         build.highestTier,
         build.CDCValue,
         build.RDCValue,
-        build.wavesPerBoss,
         build.SSValue,
         build.RPCMastery,
         build.RPCValue,
@@ -147,7 +144,6 @@ function App() {
         build.farmingWave,
         build.WSCardLevel,
         build.WSMasteryLevel,
-        build.ISMastery,
         build.hasWSM,
     ]);
 
@@ -156,7 +152,6 @@ function App() {
         [dailyShards, simResult]
     );
 
-    // Calculate comparison values
     const dailyShards2 = useMemo(() => {
         if (!comparisonBuild) return null;
         return calculateDailyShards({ ...comparisonBuild });

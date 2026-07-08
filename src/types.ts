@@ -6,6 +6,7 @@ export interface fleetRewards{
 }
 
 export interface TierConfig{
+    bossWave: number,
     tierNumber: number;
     firstSpawn: number;
     frequency: number;
@@ -13,13 +14,11 @@ export interface TierConfig{
 }
 
 
-
 export interface PlayerBuild {
     version: number;
     waveValue: number;
     DMSValue: number;
     highestTier: number;
-    wavesPerBoss: number;
     shattersRares: boolean;
     CDCValue: number;
     hasRPC: boolean;
@@ -35,7 +34,6 @@ export interface PlayerBuild {
     fetchFC: number;
     fetchDFC: number;
 
-    ISMastery: number;
     farmingTier: number;
     farmingWave: number;
 }
