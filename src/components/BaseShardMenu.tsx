@@ -6,7 +6,6 @@ import {
     CDC_LAB,
     FARMING_TIER,
     HIGHEST_TIER,
-    IS_MASTERY,
     RDC_LAB,
     RPC_MASTERY,
     SS_LAB,
@@ -75,15 +74,37 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                 />
 
                 <div>
-                    <Label className="pb-2">Waves/Boss</Label>
-                    <RangeSelect
-                        min={10}
-                        max={5}
-                        step={-1}
-                        value={data.wavesPerBoss}
-                        onChange={(val) => updateField("wavesPerBoss", val)}
-                        formatLabel={(val) => `${val}`}
-                    />
+                    <div>
+                        <CardLevelPicker
+                            label="Farming Tier"
+                            levels={FARMING_TIER}
+                            currentLevel={data.farmingTier}
+                            onChange={(val) =>
+                                updateField("farmingTier", Math.min(val, 30000))
+                            }
+                            unit=""
+                            prefix=""
+                            min={1}
+                        />
+                    </div>
+
+                    <div className="flex py-2">
+                        <Label className="pr-4 mt-2">Farming Wave</Label>
+                        <Input
+                            className="w-1/5"
+                            type="number"
+                            id="farmingWave"
+                            value={data.farmingWave}
+                            onChange={(e) => {
+                                const val = Number(e.target.value);
+
+                                updateField(
+                                    "farmingWave",
+                                    Math.min(val, 30000)
+                                );
+                            }}
+                        />
+                    </div>
                 </div>
 
                 <CardLevelPicker
@@ -245,50 +266,6 @@ export default function BaseShardMenu({ data, setBuild }: BaseShardProps) {
                         Enable Fetch to configure levels
                     </div>
                 )}
-                <Label className="text-xl sm:text-3xl">Fleet Farming</Label>
-                <hr className="border-gray-500" />
-
-                <CardLevelPicker
-                    label="Intro Sprint Mastery"
-                    levels={IS_MASTERY}
-                    currentLevel={data.ISMastery}
-                    onChange={(val) => updateField("ISMastery", val)}
-                    unit=""
-                    prefix=""
-                />
-                <div>
-                    <div>
-                        <CardLevelPicker
-                            label="Farming Tier"
-                            levels={FARMING_TIER}
-                            currentLevel={data.farmingTier}
-                            onChange={(val) =>
-                                updateField("farmingTier", Math.min(val, 30000))
-                            }
-                            unit=""
-                            prefix=""
-                            min={14}
-                        />
-                    </div>
-
-                    <div className="flex py-2">
-                        <Label className="pr-4 mt-2">Farming Wave</Label>
-                        <Input
-                            className="w-1/5"
-                            type="number"
-                            id="farmingWave"
-                            value={data.farmingWave}
-                            onChange={(e) => {
-                                const val = Number(e.target.value);
-
-                                updateField(
-                                    "farmingWave",
-                                    Math.min(val, 30000)
-                                );
-                            }}
-                        />
-                    </div>
-                </div>
             </div>
         </>
     );

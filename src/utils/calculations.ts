@@ -1,7 +1,6 @@
 import {
     CDC_LAB,
     HIGHEST_TIER,
-    IS_MASTERY,
     RDC_LAB,
     RPC_MASTERY,
     SS_LAB,
@@ -32,15 +31,18 @@ export const calculateDMS = (inputs: PlayerBuild): number => {
     return effectiveDMS;
 };
 
-export const calculateDropChances = (inputs: PlayerBuild): number => {
+export const calculateDropChances = (
+  inputs: PlayerBuild,
+): number => {
+    const wavePerBoss = gameTiers[inputs.farmingTier].bossWave;
     const SSValue = 1 + SS_LAB[inputs.SSValue] / 100;
     const CDCValue = CDC_LAB[inputs.CDCValue] / 100;
     const RDCValue = RDC_LAB[inputs.RDCValue] / 100;
     const WSMulti = calculateWaveSkip(inputs);
     const waveValue = (inputs.waveValue/100) * (86400 /30.14) * 5
 
-    const CDC = ((waveValue* WSMulti) / inputs.wavesPerBoss) * SSValue *(CDCValue * 5)
-    const RDC = inputs.shattersRares ? ((waveValue* WSMulti) / inputs.wavesPerBoss) * SSValue *(RDCValue * 10) : 0;
+    const CDC = ((waveValue* WSMulti) / wavePerBoss) * SSValue *(CDCValue * 5)
+    const RDC = inputs.shattersRares ? ((waveValue* WSMulti) / wavePerBoss) * SSValue *(RDCValue * 10) : 0;
 
     const total = CDC+RDC
 
@@ -94,17 +96,30 @@ export const enemyRewardRules: fleetRewards = {
 };
 
 const gameTiers: Record<number, TierConfig> = {
-    14: { tierNumber: 14, firstSpawn: 2495, frequency: 1000 },
-    15: { tierNumber: 15, firstSpawn: 1495, frequency: 750 },
-    16: { tierNumber: 16, firstSpawn: 995, frequency: 500 },
-    17: { tierNumber: 17, firstSpawn: 495, frequency: 250 },
-    18: { tierNumber: 18, firstSpawn: 95, frequency: 100 },
-    19: { tierNumber: 19, firstSpawn: 45, frequency: 50 },
-    20: { tierNumber: 20, firstSpawn: 5, frequency: 10 },
-    21: { tierNumber: 21, firstSpawn: 5, frequency: 10, count: 2 },
-    22: { tierNumber: 22, firstSpawn: 5, frequency: 10, count: 3},
-    23: { tierNumber: 23, firstSpawn: 5, frequency: 10, count: 3},
-    24: { tierNumber: 24, firstSpawn: 5, frequency: 10, count: 3}
+    1: { bossWave: 10, tierNumber: 1, firstSpawn: 15000, frequency: 100},
+    2: { bossWave: 10, tierNumber: 1, firstSpawn: 14750, frequency: 100},
+    3: { bossWave: 10, tierNumber: 1, firstSpawn: 14500, frequency: 100},
+    4: { bossWave: 10, tierNumber: 1, firstSpawn: 14250, frequency: 100},
+    5: { bossWave: 10, tierNumber: 1, firstSpawn: 14000, frequency: 100},
+    6: { bossWave: 10, tierNumber: 1, firstSpawn: 13750, frequency: 100},
+    7: { bossWave: 10, tierNumber: 1, firstSpawn: 13500, frequency: 100},
+    8: { bossWave: 10, tierNumber: 1, firstSpawn: 13250, frequency: 100},
+    9: { bossWave: 10, tierNumber: 1, firstSpawn: 13000, frequency: 100},
+    10: { bossWave: 10, tierNumber: 1, firstSpawn: 12750, frequency: 100},
+    11: { bossWave: 10, tierNumber: 1, firstSpawn: 12500, frequency: 100},
+    12: { bossWave: 10, tierNumber: 1, firstSpawn: 12250, frequency: 100},
+    13: { bossWave: 10, tierNumber: 1, firstSpawn: 12000, frequency: 100},
+    14: { bossWave: 9, tierNumber: 14, firstSpawn: 2495, frequency: 1000 },
+    15: { bossWave: 8, tierNumber: 15, firstSpawn: 1495, frequency: 750 },
+    16: { bossWave: 7, tierNumber: 16, firstSpawn: 995, frequency: 500 },
+    17: { bossWave: 6, tierNumber: 17, firstSpawn: 495, frequency: 250 },
+    18: { bossWave: 5, tierNumber: 18, firstSpawn: 95, frequency: 100 },
+    19: { bossWave: 5, tierNumber: 19, firstSpawn: 45, frequency: 50 },
+    20: { bossWave: 5, tierNumber: 20, firstSpawn: 5, frequency: 10 },
+    21: { bossWave: 5, tierNumber: 21, firstSpawn: 5, frequency: 10, count: 2 },
+    22: { bossWave: 5, tierNumber: 22, firstSpawn: 5, frequency: 10, count: 3},
+    23: { bossWave: 5, tierNumber: 23, firstSpawn: 5, frequency: 10, count: 3},
+    24: { bossWave: 5, tierNumber: 24, firstSpawn: 5, frequency: 10, count: 3}
 };
 
 export function simulateDeterministicRun(
@@ -113,7 +128,6 @@ export function simulateDeterministicRun(
     rewardConfig: fleetRewards,
     build: PlayerBuild
 ): number {
-    const ISMastery = IS_MASTERY[build.ISMastery];
     const tier = gameTiers[tierKey];
     const waveValue = (build.waveValue/100) * (86400 /30.14) * 5
 
@@ -124,8 +138,8 @@ export function simulateDeterministicRun(
     let totalRewards = 0;
     const spawnCountMultiplier = tier.count ?? 1;
 
-    for (let wave = 1; wave <= maxWave; wave++) {
-        if (wave >= ISMastery) {
+    for (let wave = 1800; wave <= maxWave; wave++) {
+       
             if (wave >= tier.firstSpawn) {
                 if ((wave - tier.firstSpawn) % tier.frequency === 0) {
                     const spawnsThisWave = spawnCountMultiplier;
@@ -134,11 +148,10 @@ export function simulateDeterministicRun(
                     totalRewards += rewardPerFleet * spawnsThisWave;
                 }
             }
-        }
     }
 
     const dailyRewards =
-        (((waveValue * WSMulti) / (maxWave - ISMastery / WSMulti + 180)) *
+        (((waveValue * WSMulti) / (maxWave - 1800 / WSMulti + 180)) *
             totalRewards) /
         5;
     return dailyRewards;
