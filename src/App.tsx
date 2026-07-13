@@ -122,6 +122,7 @@ function App() {
         build.RPCMastery,
         build.RPCValue,
         build.WSCardLevel,
+        build.hasWSM,
         build.WSMasteryLevel,
         build.shattersRares,
         build.hasRPC,
