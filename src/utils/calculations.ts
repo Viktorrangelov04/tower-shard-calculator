@@ -130,7 +130,6 @@ export function simulateDeterministicRun(
 ): number {
     const tier = gameTiers[tierKey];
     const waveValue = (build.waveValue/100) * (86400 /30.14) * 5
-
     const WSMulti = calculateWaveSkip(build);
 
     if (!tier) throw new Error(`Tier key ${tierKey} does not exist.`);
@@ -151,7 +150,7 @@ export function simulateDeterministicRun(
     }
 
     const dailyRewards =
-        (((waveValue * WSMulti) / (maxWave - 1800 / WSMulti + 180)) *
+        (((waveValue * WSMulti) / (maxWave - 1800 / WSMulti + 195)) *
             totalRewards) /
         5;
     return dailyRewards;

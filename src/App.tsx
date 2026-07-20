@@ -141,6 +141,7 @@ function App() {
             build
         );
     }, [
+        build.waveValue,
         build.farmingTier,
         build.farmingWave,
         build.WSCardLevel,
